@@ -10,7 +10,17 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Tavo" />
 <link rel="apple-touch-icon" href="/icon.png" />
-<style>html,body,#root{height:100%;margin:0;background:#0F1113;overscroll-behavior:none}</style>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #0F1113; }
+  body { overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
+  #root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 100dvh;
+  }
+  #root > * { flex: 1 1 auto; min-height: 0; }
+</style>
 </head>
 <body><div id="root"></div></body>
 </html>
