@@ -7,6 +7,7 @@ import { useAuth } from '../../src/lib/auth';
 import { Stack, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { supabase } from '../../src/lib/supabase';
 import { Tile, Metric, Chip, Btn, Sub } from '../../src/lib/ui';
+import { Screen } from '../../src/lib/Screen';
 import { t, sev } from '../../src/lib/theme';
 import type { EventRow, Requirement, Track } from '../../src/lib/types';
 
@@ -45,7 +46,7 @@ export default function EventDetail() {
     const { data, error } = await supabase.rpc('create_invite',
       { p_event_id: ev.id, p_email: null, p_max_uses: null, p_days: 60 });
     if (error) return Alert.alert('Fehler', error.message);
-    const text = `Ich plane "${ev.title}" \u2014 trag kurz ein, was du isst und was nicht:\n${inviteUrl(data as string)}`;
+    const text = `Ich plane "${ev.title}" — trag kurz ein, was du isst und was nicht:\n${inviteUrl(data as string)}`;
     await Clipboard.setStringAsync(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
@@ -58,7 +59,7 @@ export default function EventDetail() {
   const soft = reqs.filter(r => r.severity === 'taste');
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ padding: 16, gap: 12 }}>
+    <Screen>
       <Stack.Screen options={{ title: ev?.title ?? 'Event' }} />
 
       <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -74,11 +75,11 @@ export default function EventDetail() {
           <Text style={{ color: t.danger, fontWeight: '600', marginBottom: 6 }}>Sicherheit</Text>
           {safety.map(r => (
             <Text key={r.label} style={{ color: t.text, fontSize: 14, marginBottom: 2 }}>
-              {r.label}{r.names.length ? ' \u2014 ' + r.names.join(', ') : ' \u2014 ' + r.people + ' Person(en)'}
+              {r.label}{r.names.length ? ' — ' + r.names.join(', ') : ' — ' + r.people + ' Person(en)'}
             </Text>
           ))}
           <Text style={{ color: t.faint, fontSize: 11, marginTop: 6, lineHeight: 16 }}>
-            Die App prueft keine Verpackungen und garantiert keine Kontaminationsfreiheit.
+            Die App prüft keine Verpackungen und garantiert keine Kontaminationsfreiheit.
           </Text>
         </Tile>
       )}
@@ -86,19 +87,19 @@ export default function EventDetail() {
       <Tile>
         <Text style={{ color: t.text, fontWeight: '600', marginBottom: 8 }}>Feste Anforderungen</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-          {firm.map(r => <Chip key={r.label} text={r.label + ' \u00b7 ' + r.people} color={sev.conviction.color} />)}
+          {firm.map(r => <Chip key={r.label} text={r.label + ' · ' + r.people} color={sev.conviction.color} />)}
           {firm.length === 0 && <Sub>Keine</Sub>}
         </View>
         <Text style={{ color: t.text, fontWeight: '600', marginTop: 12, marginBottom: 8 }}>Geschmack</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-          {soft.map(r => <Chip key={r.label} text={r.label + ' \u00b7 ' + r.people} />)}
+          {soft.map(r => <Chip key={r.label} text={r.label + ' · ' + r.people} />)}
           {soft.length === 0 && <Sub>Keine</Sub>}
         </View>
       </Tile>
 
       <Tile>
         <Text style={{ color: t.text, fontWeight: '600', marginBottom: 4 }}>Tracks</Text>
-        <Sub>Parallele Loesungen. Grillen und vegan sind gleichwertig, kein Kompromiss.</Sub>
+        <Sub>Parallele Lösungen. Grillen und vegan sind gleichwertig, kein Kompromiss.</Sub>
         <View style={{ marginTop: 10, gap: 8 }}>
           {tracks.map(tr => (
             <View key={tr.id} style={{ backgroundColor: t.tile2, borderRadius: t.rs, padding: 12 }}>
@@ -110,7 +111,7 @@ export default function EventDetail() {
         </View>
         {isHost && (
           <>
-            <TextInput placeholder="Track hinzufuegen, z. B. Vegan" placeholderTextColor={t.faint}
+            <TextInput placeholder="Track hinzufügen, z. B. Vegan" placeholderTextColor={t.faint}
               value={trackName} onChangeText={setTrackName}
               style={{ color: t.text, fontSize: 15, marginTop: 12, paddingVertical: 6 }} />
             <Btn title="Track anlegen" kind="ghost" onPress={addTrack} />
@@ -123,10 +124,10 @@ export default function EventDetail() {
       {ev && isHost && (
         <Tile>
           <Text style={{ color: t.text, fontWeight: '600' }}>Einladen</Text>
-          <Sub>Erzeugt einen Einladungslink und legt ihn in die Zwischenablage \u2014 fertig zum Einfuegen in WhatsApp. Der Link gilt 60 Tage fuer beliebig viele Personen.</Sub>
+          <Sub>Erzeugt einen Einladungslink und legt ihn in die Zwischenablage — fertig zum Einfügen in WhatsApp. Der Link gilt 60 Tage für beliebig viele Personen.</Sub>
           <Btn title={copied ? 'Link kopiert' : 'Einladungslink kopieren'} onPress={copyInvite} />
         </Tile>
       )}
-    </ScrollView>
+    </Screen>
   );
 }

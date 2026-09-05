@@ -49,7 +49,7 @@ export function AuthForm({ initialToken = '', onDone }: {
     if (!name.trim()) return setErr('Bitte einen Namen eingeben');
     if (!email.trim()) return setErr('Bitte eine E-Mail eingeben');
     if (pw.length < 8) return setErr('Das Passwort braucht mindestens 8 Zeichen');
-    if (pw !== pw2) return setErr('Die beiden Passwoerter stimmen nicht ueberein');
+    if (pw !== pw2) return setErr('Die beiden Passwörter stimmen nicht überein');
     setBusy(true);
     try { const ev = await redeem(token, name, email, pw); onDone(ev); }
     catch (e: any) { setErr(e.message); } finally { setBusy(false); }
@@ -58,7 +58,7 @@ export function AuthForm({ initialToken = '', onDone }: {
   return (
     <View>
       <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
-        {([['login', 'Anmelden'], ['invite', 'Einladung einloesen']] as const).map(([m, l]) => (
+        {([['login', 'Anmelden'], ['invite', 'Einladung einlösen']] as const).map(([m, l]) => (
           <Pressable key={m} onPress={() => { setMode(m); setErr(null); }} style={{ flex: 1 }}>
             <View style={{
               borderRadius: t.rs, paddingVertical: 9, alignItems: 'center',
@@ -79,7 +79,7 @@ export function AuthForm({ initialToken = '', onDone }: {
           {check && (
             <Text style={{ color: check.valid ? t.accent : t.danger, fontSize: 13, marginBottom: 10 }}>
               {check.valid
-                ? 'Einladung gueltig' + (check.event_title ? ' \u00b7 ' + check.event_title : '')
+                ? 'Einladung gültig' + (check.event_title ? ' · ' + check.event_title : '')
                 : check.reason}
             </Text>
           )}
@@ -104,8 +104,8 @@ export function AuthForm({ initialToken = '', onDone }: {
       <Btn title={busy ? 'Moment...' : mode === 'invite' ? 'Konto anlegen' : 'Anmelden'} onPress={submit} />
       {mode === 'login' && (
         <Text style={{ color: t.faint, fontSize: 12, marginTop: 16, lineHeight: 18 }}>
-          Ein Konto entsteht nur ueber einen Einladungslink. Wenn du einen bekommen
-          hast, oeffne ihn oder wechsle oben auf "Einladung einloesen".
+          Ein Konto entsteht nur über einen Einladungslink. Wenn du einen bekommen
+          hast, öffne ihn oder wechsle oben auf "Einladung einlösen".
         </Text>
       )}
     </View>

@@ -4,6 +4,7 @@ import { Stack, router, useFocusEffect } from 'expo-router';
 import { supabase } from '../src/lib/supabase';
 import { useAuth } from '../src/lib/auth';
 import { Tile, Btn, Sub, Chip } from '../src/lib/ui';
+import { Screen } from '../src/lib/Screen';
 import { t, sev } from '../src/lib/theme';
 import type { Preference, Severity, Visibility } from '../src/lib/types';
 
@@ -41,7 +42,7 @@ export default function Profile() {
   }
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ padding: 16, gap: 12 }}>
+    <Screen>
       <Stack.Screen options={{ title: 'Profil' }} />
 
       <Tile>
@@ -50,7 +51,7 @@ export default function Profile() {
       </Tile>
 
       <Tile>
-        <Text style={{ color: t.text, fontWeight: '600', marginBottom: 8 }}>Neue Praeferenz</Text>
+        <Text style={{ color: t.text, fontWeight: '600', marginBottom: 8 }}>Neue Präferenz</Text>
         <TextInput placeholder="z. B. Koriander, Erdnuss, vegan" placeholderTextColor={t.faint}
           value={label} onChangeText={setLabel}
           style={{ color: t.text, fontSize: 16, paddingVertical: 6 }} />
@@ -90,7 +91,7 @@ export default function Profile() {
             Bei Sicherheitseintraegen wird der Name auch bei "Nur Anzahl" an Mitkochende weitergegeben.
           </Text>
         )}
-        <Btn title="Hinzufuegen" onPress={add} />
+        <Btn title="Hinzufügen" onPress={add} />
       </Tile>
 
       <Tile>
@@ -110,10 +111,10 @@ export default function Profile() {
             </View>
           </Pressable>
         ))}
-        <Sub>Lange druecken zum Loeschen.</Sub>
+        <Sub>Lange drücken zum Löschen.</Sub>
       </Tile>
 
       <Btn title="Abmelden" kind="ghost" onPress={async () => { await signOut(); router.replace('/'); }} />
-    </ScrollView>
+    </Screen>
   );
 }

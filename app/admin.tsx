@@ -5,6 +5,7 @@ import * as Clipboard from 'expo-clipboard';
 import { supabase } from '../src/lib/supabase';
 import { useAuth } from '../src/lib/auth';
 import { Tile, Metric, Sub, Chip, Btn } from '../src/lib/ui';
+import { Screen } from '../src/lib/Screen';
 import { t } from '../src/lib/theme';
 import { inviteUrl } from '../src/lib/invite';
 
@@ -43,12 +44,12 @@ export default function Admin() {
   if (me?.role !== 'admin') return (
     <View style={{ flex: 1, backgroundColor: t.bg, padding: 24, justifyContent: 'center' }}>
       <Stack.Screen options={{ title: 'Admin' }} />
-      <Sub>Dieser Bereich ist nur fuer Administratoren.</Sub>
+      <Sub>Dieser Bereich ist nur für Administratoren.</Sub>
     </View>
   );
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ padding: 16, gap: 12 }}>
+    <Screen>
       <Stack.Screen options={{ title: 'Nutzer' }} />
       <View style={{ flexDirection: 'row', gap: 10 }}>
         <Metric label="Nutzer" value={rows.length} />
@@ -57,8 +58,8 @@ export default function Admin() {
       </View>
 
       <Tile>
-        <Text style={{ color: t.text, fontWeight: '600' }}>Einladung fuer eine Person</Text>
-        <Sub>Einmal einloesbar, gilt 30 Tage. Ohne Bezug zu einem Event.</Sub>
+        <Text style={{ color: t.text, fontWeight: '600' }}>Einladung für eine Person</Text>
+        <Sub>Einmal einlösbar, gilt 30 Tage. Ohne Bezug zu einem Event.</Sub>
         <Btn title={copied ? 'Link kopiert' : 'Einladungslink erzeugen'} kind="ghost" onPress={newInvite} />
       </Tile>
 
@@ -82,13 +83,13 @@ export default function Admin() {
           </Pressable>
         ))}
         {rows.length === 0 && <Sub>Noch niemand angemeldet.</Sub>}
-        <Sub>Lange druecken zum Sperren oder Entsperren.</Sub>
+        <Sub>Lange drücken zum Sperren oder Entsperren.</Sub>
       </Tile>
 
       <Text style={{ color: t.faint, fontSize: 12, lineHeight: 18 }}>
-        Praeferenzen anderer Nutzer sind hier bewusst nicht sichtbar. Wer "nur Anzahl"
-        einstellt, verlaesst sich darauf \u2014 auch gegenueber Administratoren.
+        Präferenzen anderer Nutzer sind hier bewusst nicht sichtbar. Wer "nur Anzahl"
+        einstellt, verlässt sich darauf — auch gegenüber Administratoren.
       </Text>
-    </ScrollView>
+    </Screen>
   );
 }

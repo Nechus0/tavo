@@ -45,7 +45,7 @@ export function People({ people, tracks, isHost, onChange }: {
                   backgroundColor: t.tile2, borderRadius: t.rs, padding: 12 }}>
                   <View style={{ flex: 1 }}>
                     <Text style={{ color: t.text, fontSize: 15 }}>
-                      {p.name}{p.is_host ? '  \u00b7  Gastgeber' : ''}
+                      {p.name}{p.is_host ? '  ·  Gastgeber' : ''}
                     </Text>
                     <Text style={{ color: track ? t.accent : t.faint, fontSize: 12, marginTop: 2 }}>
                       {track ? track.name : 'kein Track'}

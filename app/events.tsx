@@ -28,7 +28,8 @@ export default function Events() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: t.bg, padding: 16 }}>
+    <View style={{ flex: 1, backgroundColor: t.bg, padding: 16, alignItems: 'center' }}>
+      <View style={{ width: '100%', maxWidth: 460, flex: 1 }}>
       <Stack.Screen options={{ title: 'Events', headerRight: () => (
         <View style={{ flexDirection: 'row', gap: 14 }}>
           {me?.role === 'admin' && (
@@ -57,6 +58,7 @@ export default function Events() {
             </Tile>
           </Pressable>
         )} />
+      </View>
     </View>
   );
 }

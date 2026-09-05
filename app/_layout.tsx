@@ -12,7 +12,9 @@ export default function RootLayout() {
         headerTintColor: t.text,
         headerShadowVisible: false,
         contentStyle: { backgroundColor: t.bg },
-      }} />
+      }}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+      </Stack>
     </AuthProvider>
   );
 }

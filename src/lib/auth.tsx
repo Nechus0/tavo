@@ -21,7 +21,7 @@ export const useAuth = () => useContext(AuthCtx);
 function human(msg: string) {
   const m = msg.toLowerCase();
   if (m.includes('invalid login credentials')) return 'E-Mail oder Passwort stimmt nicht.';
-  if (m.includes('email not confirmed')) return 'Das Konto ist noch nicht bestaetigt.';
+  if (m.includes('email not confirmed')) return 'Das Konto ist noch nicht bestätigt.';
   return msg;
 }
 
