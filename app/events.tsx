@@ -8,7 +8,7 @@ import { t } from '../src/lib/theme';
 import type { EventRow } from '../src/lib/types';
 
 export default function Events() {
-  const { session } = useAuth();
+  const { session, me } = useAuth();
   const [rows, setRows] = useState<EventRow[]>([]);
   const [title, setTitle] = useState('');
 
@@ -30,7 +30,13 @@ export default function Events() {
   return (
     <View style={{ flex: 1, backgroundColor: t.bg, padding: 16 }}>
       <Stack.Screen options={{ title: 'Events', headerRight: () => (
-        <Pressable onPress={() => router.push('/profile')}><Text style={{ color: t.accent }}>Profil</Text></Pressable>) }} />
+        <View style={{ flexDirection: 'row', gap: 14 }}>
+          {me?.is_admin && (
+            <Pressable onPress={() => router.push('/admin')}>
+              <Text style={{ color: t.dim }}>Admin</Text></Pressable>)}
+          <Pressable onPress={() => router.push('/profile')}>
+            <Text style={{ color: t.accent }}>Profil</Text></Pressable>
+        </View>) }} />
       <Tile>
         <TextInput placeholder="Neues Event, z. B. Grillabend" placeholderTextColor={t.faint}
           value={title} onChangeText={setTitle}

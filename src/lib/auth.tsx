@@ -2,11 +2,14 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
+export type Me = { id: string; display_name: string; email: string | null; is_admin: boolean };
+
 type Ctx = {
   session: Session | null;
+  me: Me | null;
   loading: boolean;
-  displayName: string | null;
-  register: (name: string) => Promise<void>;
+  signUp: (name: string, email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 const AuthCtx = createContext<Ctx>({} as Ctx);
@@ -14,51 +17,50 @@ export const useAuth = () => useContext(AuthCtx);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
-  const [displayName, setDisplayName] = useState<string | null>(null);
+  const [me, setMe] = useState<Me | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function loadName(s: Session | null) {
-    if (!s) return setDisplayName(null);
-    const { data } = await supabase.from('profiles').select('display_name').eq('id', s.user.id).maybeSingle();
-    setDisplayName(data?.display_name ?? null);
+  async function loadMe(s: Session | null) {
+    if (!s) return setMe(null);
+    const { data } = await supabase.from('profiles')
+      .select('id, display_name, email, is_admin').eq('id', s.user.id).maybeSingle();
+    setMe(data as Me | null);
   }
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
-      setSession(data.session);
-      await loadName(data.session);
-      setLoading(false);
+      setSession(data.session); await loadMe(data.session); setLoading(false);
     });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-      setSession(s);
-      loadName(s);
-    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => { setSession(s); loadMe(s); });
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  async function register(name: string) {
-    const clean = name.trim();
-    if (!clean) throw new Error('Bitte einen Namen eingeben');
-    let current = session;
-    if (!current) {
-      const { data, error } = await supabase.auth.signInAnonymously({
-        options: { data: { full_name: clean } },
-      });
-      if (error) throw error;
-      current = data.session;
-      setSession(current);
-    }
-    if (!current) throw new Error('Anmeldung fehlgeschlagen');
-    const { error: pe } = await supabase.from('profiles')
-      .upsert({ id: current.user.id, display_name: clean });
-    if (pe) throw pe;
-    setDisplayName(clean);
+  async function signUp(name: string, email: string, password: string) {
+    if (!name.trim()) throw new Error('Bitte einen Namen eingeben');
+    if (password.length < 8) throw new Error('Das Passwort braucht mindestens 8 Zeichen');
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim().toLowerCase(),
+      password,
+      options: { data: { display_name: name.trim() } },
+    });
+    if (error) throw error;
+    if (!data.session) throw new Error('Bitte bestaetige zuerst die E-Mail und melde dich dann an.');
+    await loadMe(data.session);
   }
 
-  const signOut = async () => { await supabase.auth.signOut(); setDisplayName(null); };
+  async function signIn(email: string, password: string) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(), password,
+    });
+    if (error) throw new Error(error.message === 'Invalid login credentials'
+      ? 'E-Mail oder Passwort stimmt nicht.' : error.message);
+    await loadMe(data.session);
+  }
+
+  const signOut = async () => { await supabase.auth.signOut(); setMe(null); };
 
   return (
-    <AuthCtx.Provider value={{ session, loading, displayName, register, signOut }}>
+    <AuthCtx.Provider value={{ session, me, loading, signUp, signIn, signOut }}>
       {children}
     </AuthCtx.Provider>
   );

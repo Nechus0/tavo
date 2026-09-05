@@ -15,7 +15,7 @@ const VIS: { k: Visibility; label: string }[] = [
 ];
 
 export default function Profile() {
-  const { session, signOut } = useAuth();
+  const { session, me, signOut } = useAuth();
   const [prefs, setPrefs] = useState<Preference[]>([]);
   const [label, setLabel] = useState('');
   const [severity, setSeverity] = useState<Severity>('taste');
@@ -43,6 +43,11 @@ export default function Profile() {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ padding: 16, gap: 12 }}>
       <Stack.Screen options={{ title: 'Profil' }} />
+
+      <Tile>
+        <Text style={{ color: t.text, fontSize: 17, fontWeight: '600' }}>{me?.display_name}</Text>
+        <Sub>{me?.email}</Sub>
+      </Tile>
 
       <Tile>
         <Text style={{ color: t.text, fontWeight: '600', marginBottom: 8 }}>Neue Praeferenz</Text>

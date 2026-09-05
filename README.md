@@ -1,4 +1,4 @@
-# Prefme
+# Tavo
 
 Praeferenz- und Event-App fuer Freundesgruppen. Jede Person pflegt einmal ihr
 Profil (was sie isst, was nicht, was ihr wichtig ist). Wer ein Event anlegt,
@@ -30,9 +30,13 @@ Durchgesetzt serverseitig in der RPC `event_requirements`, nicht nur im UI.
 Expo Router als Web-App (React Native Web, TypeScript) + Supabase (Postgres, RLS).
 Wird zum Homescreen hinzugefuegt, kein App Store.
 
-Anmeldung ohne Passwort: der Admin schickt einen Einladungslink, die Person
-gibt ihren Namen ein und bekommt eine anonyme Supabase-Session. Der Zugang
-haengt am Browser des Geraets.
+Anmeldung ueber Supabase Auth mit Name, E-Mail und Passwort. Der Admin
+verschickt Einladungslinks (Kopier-Button im Event) per WhatsApp; wer den
+Link oeffnet, sieht eine Vorschau des Events und registriert sich direkt dort.
+
+Der zuerst registrierte Account wird automatisch Admin und sieht unter /admin
+die Nutzerliste. Praeferenzen anderer bleiben auch fuer Admins an die
+Sichtbarkeitseinstellung gebunden.
 
 ## Setup
 

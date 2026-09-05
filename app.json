@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Prefme",
-    "slug": "prefme",
-    "scheme": "prefme",
+    "name": "Tavo",
+    "slug": "tavo",
+    "scheme": "tavo",
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
@@ -13,8 +13,8 @@
       "bundler": "metro",
       "output": "single",
       "favicon": "./assets/favicon.png",
-      "name": "Prefme",
-      "shortName": "Prefme",
+      "name": "Tavo",
+      "shortName": "Tavo",
       "themeColor": "#0F1113",
       "backgroundColor": "#0F1113",
       "display": "standalone",
