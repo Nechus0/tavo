@@ -1,12 +1,18 @@
 {
   "name": "Tavo",
   "short_name": "Tavo",
-  "start_url": "/",
+  "start_url": "/tavo/",
   "display": "standalone",
   "background_color": "#0F1113",
   "theme_color": "#0F1113",
   "lang": "de",
   "icons": [
-    { "src": "/icon.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any maskable" }
-  ]
+    {
+      "src": "/tavo/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "scope": "/tavo/"
 }

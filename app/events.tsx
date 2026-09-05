@@ -31,9 +31,9 @@ export default function Events() {
     <View style={{ flex: 1, backgroundColor: t.bg, padding: 16 }}>
       <Stack.Screen options={{ title: 'Events', headerRight: () => (
         <View style={{ flexDirection: 'row', gap: 14 }}>
-          {me?.is_admin && (
+          {me?.role === 'admin' && (
             <Pressable onPress={() => router.push('/admin')}>
-              <Text style={{ color: t.dim }}>Admin</Text></Pressable>)}
+              <Text style={{ color: t.dim }}>Nutzer</Text></Pressable>)}
           <Pressable onPress={() => router.push('/profile')}>
             <Text style={{ color: t.accent }}>Profil</Text></Pressable>
         </View>) }} />
@@ -53,7 +53,7 @@ export default function Events() {
           <Pressable onPress={() => router.push(`/event/${item.id}`)}>
             <Tile>
               <Text style={{ color: t.text, fontSize: 17, fontWeight: '600' }}>{item.title}</Text>
-              <Sub>{item.location ?? 'Kein Ort'} · Code {item.invite_code}</Sub>
+              <Sub>{item.location ?? 'Kein Ort'}</Sub>
             </Tile>
           </Pressable>
         )} />

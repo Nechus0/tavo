@@ -30,13 +30,27 @@ Durchgesetzt serverseitig in der RPC `event_requirements`, nicht nur im UI.
 Expo Router als Web-App (React Native Web, TypeScript) + Supabase (Postgres, RLS).
 Wird zum Homescreen hinzugefuegt, kein App Store.
 
-Anmeldung ueber Supabase Auth mit Name, E-Mail und Passwort. Der Admin
-verschickt Einladungslinks (Kopier-Button im Event) per WhatsApp; wer den
-Link oeffnet, sieht eine Vorschau des Events und registriert sich direkt dort.
+**Anwendung:** <https://nechus0.github.io/tavo/>
 
-Der zuerst registrierte Account wird automatisch Admin und sieht unter /admin
-die Nutzerliste. Praeferenzen anderer bleiben auch fuer Admins an die
+Der Zugang ist geschlossen. Konten entstehen ausschliesslich ueber einen
+Einladungslink. Es werden keine Bestaetigungsmails verschickt.
+
+| Einladungsart | Erzeugt in | Gueltigkeit |
+|---|---|---|
+| Event-Einladung | Event > Einladungslink kopieren | 60 Tage, beliebig viele Personen, tritt dem Event direkt bei |
+| Personen-Einladung | Nutzer > Einladungslink erzeugen | 30 Tage, einmal einloesbar, nur fuer Admins |
+
+Die Registrierung laeuft ueber die Edge Function `registrieren`, die mit dem
+Service-Key das Konto mit `email_confirm` anlegt und die Einladung hochzaehlt.
+Der Publishable Key im Browser kann das nicht.
+
+Profile tragen Rolle (`admin`/`user`) und Status (`active`/`blocked`). Der
+zuerst registrierte Account wird Admin. Unter *Nutzer* sieht er die Konten und
+kann sperren. Praeferenzen anderer bleiben auch fuer Admins an die
 Sichtbarkeitseinstellung gebunden.
+
+Deployment: GitHub Actions baut bei jedem Push nach `main` und veroeffentlicht
+`dist/` auf GitHub Pages. Supabase-URL und Key liegen als Repository-Variablen.
 
 ## Setup
 
