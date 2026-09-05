@@ -30,7 +30,7 @@ Durchgesetzt serverseitig in der RPC `event_requirements`, nicht nur im UI.
 Expo Router als Web-App (React Native Web, TypeScript) + Supabase (Postgres, RLS).
 Wird zum Homescreen hinzugefuegt, kein App Store.
 
-**Anwendung:** <https://nechus0.github.io/tavo/>
+**Anwendung:** Cloudflare Pages (siehe Deployment)
 
 Der Zugang ist geschlossen. Konten entstehen ausschliesslich ueber einen
 Einladungslink. Es werden keine Bestaetigungsmails verschickt.
@@ -49,8 +49,28 @@ zuerst registrierte Account wird Admin. Unter *Nutzer* sieht er die Konten und
 kann sperren. Praeferenzen anderer bleiben auch fuer Admins an die
 Sichtbarkeitseinstellung gebunden.
 
-Deployment: GitHub Actions baut bei jedem Push nach `main` und veroeffentlicht
-`dist/` auf GitHub Pages. Supabase-URL und Key liegen als Repository-Variablen.
+## Deployment
+
+Cloudflare Pages, direkt an dieses Repository angebunden. Cloudflare baut bei
+jedem Push nach `main` selbst — es gibt keinen Workflow im Repo.
+
+| Einstellung | Wert |
+|---|---|
+| Framework preset | None |
+| Build command | `npx expo export --platform web` |
+| Build output directory | `dist` |
+| Root directory | (leer) |
+
+Umgebungsvariablen fuer den Build:
+
+```
+EXPO_PUBLIC_SUPABASE_URL   https://doyfaavfzqftbduvkhle.supabase.co
+EXPO_PUBLIC_SUPABASE_KEY   sb_publishable_...
+NODE_VERSION               20
+```
+
+`public/_redirects` leitet alle Pfade auf `index.html` um, damit Routen wie
+`/?einladung=` und `/event/<id>` beim direkten Aufruf funktionieren.
 
 ## Setup
 

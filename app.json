@@ -24,9 +24,6 @@
     },
     "plugins": [
       "expo-router"
-    ],
-    "experiments": {
-      "baseUrl": "/tavo"
-    }
+    ]
   }
 }
