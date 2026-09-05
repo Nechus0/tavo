@@ -1,41 +1,65 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import * as WebBrowser from 'expo-web-browser';
-import * as Linking from 'expo-linking';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
-WebBrowser.maybeCompleteAuthSession();
-
-type Ctx = { session: Session | null; loading: boolean; signIn: () => Promise<void>; signOut: () => Promise<void> };
+type Ctx = {
+  session: Session | null;
+  loading: boolean;
+  displayName: string | null;
+  register: (name: string) => Promise<void>;
+  signOut: () => Promise<void>;
+};
 const AuthCtx = createContext<Ctx>({} as Ctx);
 export const useAuth = () => useContext(AuthCtx);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
+  const [displayName, setDisplayName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  async function loadName(s: Session | null) {
+    if (!s) return setDisplayName(null);
+    const { data } = await supabase.from('profiles').select('display_name').eq('id', s.user.id).maybeSingle();
+    setDisplayName(data?.display_name ?? null);
+  }
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => { setSession(data.session); setLoading(false); });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+    supabase.auth.getSession().then(async ({ data }) => {
+      setSession(data.session);
+      await loadName(data.session);
+      setLoading(false);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      setSession(s);
+      loadName(s);
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  async function signIn() {
-    const redirectTo = Linking.createURL('/auth');
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo, skipBrowserRedirect: true },
-    });
-    if (error || !data?.url) throw error ?? new Error('Keine Auth-URL erhalten');
-    const res = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
-    if (res.type !== 'success') return;
-    const { queryParams } = Linking.parse(res.url.replace('#', '?'));
-    const access_token = queryParams?.access_token as string | undefined;
-    const refresh_token = queryParams?.refresh_token as string | undefined;
-    if (access_token && refresh_token) await supabase.auth.setSession({ access_token, refresh_token });
+  async function register(name: string) {
+    const clean = name.trim();
+    if (!clean) throw new Error('Bitte einen Namen eingeben');
+    let current = session;
+    if (!current) {
+      const { data, error } = await supabase.auth.signInAnonymously({
+        options: { data: { full_name: clean } },
+      });
+      if (error) throw error;
+      current = data.session;
+      setSession(current);
+    }
+    if (!current) throw new Error('Anmeldung fehlgeschlagen');
+    const { error: pe } = await supabase.from('profiles')
+      .upsert({ id: current.user.id, display_name: clean });
+    if (pe) throw pe;
+    setDisplayName(clean);
   }
 
-  const signOut = async () => { await supabase.auth.signOut(); };
+  const signOut = async () => { await supabase.auth.signOut(); setDisplayName(null); };
 
-  return <AuthCtx.Provider value={{ session, loading, signIn, signOut }}>{children}</AuthCtx.Provider>;
+  return (
+    <AuthCtx.Provider value={{ session, loading, displayName, register, signOut }}>
+      {children}
+    </AuthCtx.Provider>
+  );
 }

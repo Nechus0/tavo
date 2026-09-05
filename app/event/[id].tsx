@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
-import { View, Text, ScrollView, Alert, TextInput } from 'react-native';
+import { View, Text, ScrollView, Alert, TextInput, Pressable, Platform } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { Stack, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { supabase } from '../../src/lib/supabase';
 import { Tile, Metric, Chip, Btn, Sub } from '../../src/lib/ui';
@@ -13,6 +14,7 @@ export default function EventDetail() {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [people, setPeople] = useState(0);
   const [trackName, setTrackName] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const load = useCallback(async () => {
     const [e, r, tr, p] = await Promise.all([
@@ -31,6 +33,21 @@ export default function EventDetail() {
       .insert({ event_id: id, name: trackName.trim(), sort_order: tracks.length });
     if (error) return Alert.alert('Fehler', error.message);
     setTrackName(''); load();
+  }
+
+  function inviteUrl() {
+    const base = (typeof window !== 'undefined' && window.location)
+      ? window.location.origin
+      : (process.env.EXPO_PUBLIC_APP_URL ?? '');
+    return `${base}/join?code=${ev?.invite_code ?? ''}`;
+  }
+
+  async function copyInvite() {
+    if (!ev) return;
+    const text = `Ich plane "${ev.title}" \u2014 trag kurz ein, was du isst und was nicht:\n${inviteUrl()}`;
+    await Clipboard.setStringAsync(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   }
 
   const safety = reqs.filter(r => r.severity === 'safety');
@@ -94,8 +111,10 @@ export default function EventDetail() {
 
       {ev && (
         <Tile>
-          <Text style={{ color: t.text, fontWeight: '600' }}>Einladungscode</Text>
-          <Text style={{ color: t.accent, fontSize: 22, fontWeight: '700', marginTop: 4 }}>{ev.invite_code}</Text>
+          <Text style={{ color: t.text, fontWeight: '600' }}>Einladen</Text>
+          <Sub>Link kopieren und in WhatsApp schicken.</Sub>
+          <Text selectable style={{ color: t.dim, fontSize: 12, marginTop: 10 }}>{inviteUrl()}</Text>
+          <Btn title={copied ? 'Kopiert' : 'Link kopieren'} onPress={copyInvite} />
         </Tile>
       )}
     </ScrollView>

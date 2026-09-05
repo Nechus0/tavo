@@ -1,4 +1,4 @@
-# Tafel
+# Prefme
 
 Praeferenz- und Event-App fuer Freundesgruppen. Jede Person pflegt einmal ihr
 Profil (was sie isst, was nicht, was ihr wichtig ist). Wer ein Event anlegt,
@@ -27,14 +27,19 @@ Durchgesetzt serverseitig in der RPC `event_requirements`, nicht nur im UI.
 
 ## Stack
 
-Expo (React Native, TypeScript, expo-router) + Supabase (Postgres, RLS, Google OAuth).
+Expo Router als Web-App (React Native Web, TypeScript) + Supabase (Postgres, RLS).
+Wird zum Homescreen hinzugefuegt, kein App Store.
+
+Anmeldung ohne Passwort: der Admin schickt einen Einladungslink, die Person
+gibt ihren Namen ein und bekommt eine anonyme Supabase-Session. Der Zugang
+haengt am Browser des Geraets.
 
 ## Setup
 
 ```bash
 npm install
 cp .env.example .env.local   # Werte eintragen
-npx expo start
+npm run build:web   # oder: npx expo start --web
 ```
 
 ## Status

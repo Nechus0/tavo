@@ -1,14 +1,27 @@
 {
   "expo": {
-    "name": "Tafel",
-    "slug": "tafel",
-    "scheme": "tafel",
+    "name": "Prefme",
+    "slug": "prefme",
+    "scheme": "prefme",
     "version": "0.1.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0F1113",
+    "icon": "./assets/icon.png",
     "newArchEnabled": true,
-    "ios": { "supportsTablet": true, "bundleIdentifier": "de.nechus.tafel" },
-    "android": { "package": "de.nechus.tafel", "edgeToEdgeEnabled": true },
-    "plugins": ["expo-router", "expo-web-browser"]
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png",
+      "name": "Prefme",
+      "shortName": "Prefme",
+      "themeColor": "#0F1113",
+      "backgroundColor": "#0F1113",
+      "display": "standalone",
+      "startUrl": "/",
+      "lang": "de",
+      "description": "Praeferenzen und Events fuer Freundesgruppen"
+    },
+    "plugins": ["expo-router"]
   }
 }
