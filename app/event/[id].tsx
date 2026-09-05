@@ -2,6 +2,8 @@ import { useCallback, useState } from 'react';
 import { View, Text, ScrollView, Alert, TextInput, Pressable, Platform } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { inviteUrl } from '../../src/lib/invite';
+import { People, RsvpBar, type Person } from '../../src/lib/People';
+import { useAuth } from '../../src/lib/auth';
 import { Stack, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { supabase } from '../../src/lib/supabase';
 import { Tile, Metric, Chip, Btn, Sub } from '../../src/lib/ui';
@@ -13,18 +15,20 @@ export default function EventDetail() {
   const [ev, setEv] = useState<EventRow | null>(null);
   const [reqs, setReqs] = useState<Requirement[]>([]);
   const [tracks, setTracks] = useState<Track[]>([]);
-  const [people, setPeople] = useState(0);
   const [trackName, setTrackName] = useState('');
   const [copied, setCopied] = useState(false);
+  const [people, setPeople] = useState<Person[]>([]);
+  const { session } = useAuth();
 
   const load = useCallback(async () => {
-    const [e, r, tr, p] = await Promise.all([
+    const [e, r, tr, pp] = await Promise.all([
       supabase.from('events').select('*').eq('id', id).single(),
       supabase.rpc('event_requirements', { e: id }),
       supabase.from('tracks').select('*').eq('event_id', id).order('sort_order'),
-      supabase.from('participants').select('id', { count: 'exact', head: true }).eq('event_id', id).in('rsvp', ['yes', 'maybe']),
+      supabase.rpc('event_people', { e: id }),
     ]);
-    setEv(e.data); setReqs(r.data ?? []); setTracks(tr.data ?? []); setPeople(p.count ?? 0);
+    setEv(e.data); setReqs(r.data ?? []); setTracks(tr.data ?? []);
+    setPeople((pp.data ?? []) as Person[]);
   }, [id]);
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
@@ -47,6 +51,8 @@ export default function EventDetail() {
     setTimeout(() => setCopied(false), 2500);
   }
 
+  const isHost = !!ev && !!session && ev.host_id === session.user.id;
+  const mine = people.find(p => p.user_id === session?.user.id) ?? null;
   const safety = reqs.filter(r => r.severity === 'safety');
   const firm = reqs.filter(r => r.severity === 'conviction');
   const soft = reqs.filter(r => r.severity === 'taste');
@@ -56,10 +62,12 @@ export default function EventDetail() {
       <Stack.Screen options={{ title: ev?.title ?? 'Event' }} />
 
       <View style={{ flexDirection: 'row', gap: 10 }}>
-        <Metric label="Zusagen" value={people} />
+        <Metric label="Zusagen" value={people.filter(p => p.rsvp === 'yes').length} />
         <Metric label="Tracks" value={tracks.length} />
         <Metric label="Regeln" value={safety.length + firm.length} />
       </View>
+
+      {mine && <RsvpBar eventId={id!} mine={mine.rsvp} onChange={load} />}
 
       {safety.length > 0 && (
         <Tile style={{ borderWidth: 1, borderColor: t.danger + '66' }}>
@@ -100,13 +108,19 @@ export default function EventDetail() {
           ))}
           {tracks.length === 0 && <Sub>Noch keine Tracks.</Sub>}
         </View>
-        <TextInput placeholder="Track hinzufuegen, z. B. Vegan" placeholderTextColor={t.faint}
-          value={trackName} onChangeText={setTrackName}
-          style={{ color: t.text, fontSize: 15, marginTop: 12, paddingVertical: 6 }} />
-        <Btn title="Track anlegen" kind="ghost" onPress={addTrack} />
+        {isHost && (
+          <>
+            <TextInput placeholder="Track hinzufuegen, z. B. Vegan" placeholderTextColor={t.faint}
+              value={trackName} onChangeText={setTrackName}
+              style={{ color: t.text, fontSize: 15, marginTop: 12, paddingVertical: 6 }} />
+            <Btn title="Track anlegen" kind="ghost" onPress={addTrack} />
+          </>
+        )}
       </Tile>
 
-      {ev && (
+      <People people={people} tracks={tracks} isHost={isHost} onChange={load} />
+
+      {ev && isHost && (
         <Tile>
           <Text style={{ color: t.text, fontWeight: '600' }}>Einladen</Text>
           <Sub>Erzeugt einen Einladungslink und legt ihn in die Zwischenablage \u2014 fertig zum Einfuegen in WhatsApp. Der Link gilt 60 Tage fuer beliebig viele Personen.</Sub>
