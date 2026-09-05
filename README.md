@@ -56,21 +56,19 @@ jedem Push nach `main` selbst — es gibt keinen Workflow im Repo.
 
 | Einstellung | Wert |
 |---|---|
-| Framework preset | None |
 | Build command | `npx expo export --platform web` |
-| Build output directory | `dist` |
-| Root directory | (leer) |
+| Deploy command | `npx wrangler deploy` |
+| Root directory | `/` |
 
-Umgebungsvariablen fuer den Build:
+`wrangler.jsonc` bindet `dist/` als statische Assets ein und setzt den
+SPA-Fallback, damit `/event/<id>` und `/?einladung=` direkt aufrufbar sind.
 
-```
-EXPO_PUBLIC_SUPABASE_URL   https://doyfaavfzqftbduvkhle.supabase.co
-EXPO_PUBLIC_SUPABASE_KEY   sb_publishable_...
-NODE_VERSION               20
-```
+Build-Variablen sind nicht noetig: URL und Publishable Key stehen als Fallback
+in `src/lib/supabase.ts`. Ueber `EXPO_PUBLIC_SUPABASE_URL` und
+`EXPO_PUBLIC_SUPABASE_KEY` lassen sie sich weiterhin ueberschreiben.
 
-`public/_redirects` leitet alle Pfade auf `index.html` um, damit Routen wie
-`/?einladung=` und `/event/<id>` beim direkten Aufruf funktionieren.
+Der Publishable Key gehoert in den Browser. Geschuetzt wird ueber die
+Row-Level-Security-Regeln, nicht ueber Geheimhaltung des Keys.
 
 ## Setup
 
